@@ -12,8 +12,8 @@ contentType="text/html; charset=UTF-8"
 </head>
 <body>
     <h1>Todoリスト</h1>
-    message
-    <p>message</p>
+    <% String message = (String)request.getAttribute("message"); %>
+    <p><%= message %></p>
     
     <span><strong>ID</strong></span>
     <span><strong>タイトル</strong></span><br>
@@ -24,8 +24,8 @@ contentType="text/html; charset=UTF-8"
     <% 
       for (HashMap<String, String> columns : rows) {
     %>
-    <span>id</span>
-    <span><a href=''>title</a></span><br>
+    <span><%= columns.get("id") %></span>
+    <span><a href=''><%= columns.get("title") %></a></span><br>
     <% } %>
     <p><a href="">新規作成</a></p>
       

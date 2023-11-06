@@ -1,40 +1,65 @@
 package controller;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
-/**
- * Servlet implementation class ListServlet
- */
+@WebServlet("/list")
 public class ListServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public ListServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		
+		if (request.getAttribute("message") == null) {
+			request.setAttribute("message", "todoを管理しましょ");
+		}
+		
+		String url = "jdbc:mysql://localhost/todo";
+		String user = "root";
+		String password = "";
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		String sql = "SELECT * FROM posts";
+		try (Connection connection = DriverManager.getConnection(url,user,password);
+		PreparedStatement statement =connection.prepareStatement(sql);
+		ResultSet results = statement.executeQuery()){
+			ArrayList<HashMap<String, String>> rows = new ArrayList<HashMap<String, String>>();
+			
+			while(results.next()) {
+				HashMap<String, String> columns = new HashMap<String, String>();
+				
+				String id = results.getString("id");
+				columns.put("id", id);
+				String title = results.getString("id");
+				columns.put("title", title);
+				String content = results.getString("id");
+				columns.put("content", content);
+				
+				rows.add(columns);
+			}
+			request.setAttribute("rows", rows);
+		} catch (Exception e) {
+			request.setAttribute("message", "Exception:" + e.getMessage());
+		}
+		
+		String view = "/WEB-INF/views/list.jsp";
+		RequestDispatcher dispatcher = request.getRequestDispatcher(view);
+		dispatcher.forward(request, response);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
 
 }
