@@ -13,14 +13,14 @@ contentType="text/html; charset=UTF-8"
 </head>
 <body>
     <h1>Todo詳細</h1>
-    message
-    <p>message</p>
-    <p><strong>タイトル：</strong>title</p>
-    <p><strong>本文：</strong>content</p><br>
+    <% String message = (String)request.getAttribute("message"); %>
+    <p><%= message %></p>
+    <p><strong>タイトル：</strong><%= request.getAttribute("title") %></p>
+    <p><strong>本文：</strong><%= request.getAttribute("content") %></p><br>
     <ul>
-      <li><p><a href="">戻る</a></p></li>
-      <li><p><a href=''>編集</a></p></li>
-      <li><p><a href=''>削除</a></p></li>
+      <li><p><a href="list">戻る</a></p></li>
+      <li><p><a href='edit?id=<%= request.getAttribute("id") %>'>編集</a></p></li>
+      <li><p><a href='destroy?id=<%= request.getAttribute("id") %>'>削除</a></p></li>
     </ul>      
 </body>
 </html>

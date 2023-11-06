@@ -5,8 +5,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -15,14 +13,15 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/list")
-public class ListServlet extends HttpServlet {
+@WebServlet("/edit")
+public class EditServlet extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
 		if (request.getAttribute("message") == null) {
 			request.setAttribute("message", "todoを管理しましょ");
 		}
+		
+		int postId = Integer.parseInt(request.getParameter("id"));
 		
 		String url = "jdbc:mysql://localhost/todo";
 		String user = "root";
@@ -33,32 +32,30 @@ public class ListServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-		String sql = "SELECT * FROM posts";
+		String sql = "SELECT * FROM posts WHERE id =?";
 		try (Connection connection = DriverManager.getConnection(url,user,password);
-		PreparedStatement statement =connection.prepareStatement(sql);
-		ResultSet results = statement.executeQuery()){
-			ArrayList<HashMap<String, String>> rows = new ArrayList<HashMap<String, String>>();
+		PreparedStatement statement =connection.prepareStatement(sql)){
+		
+			statement.setInt(1, postId);
+			ResultSet results = statement.executeQuery();
 			
 			while(results.next()) {
-				HashMap<String, String> columns = new HashMap<String, String>();
-				
 				String id = results.getString("id");
-				columns.put("id", id);
+				request.setAttribute("id", id);
 				String title = results.getString("title");
-				columns.put("title", title);
-				String content = results.getString("content");
-				columns.put("content", content);
-				
-				rows.add(columns);
+				request.setAttribute("title", title);
+				String content = results.getString("content").replaceAll("¥n", "<br>");
+				request.setAttribute("content", content);
 			}
-			request.setAttribute("rows", rows);
 		} catch (Exception e) {
 			request.setAttribute("message", "Exception:" + e.getMessage());
 		}
 		
-		String view = "/WEB-INF/views/list.jsp";
+		String view = "/WEB-INF/views/edit.jsp";
 		RequestDispatcher dispatcher = request.getRequestDispatcher(view);
 		dispatcher.forward(request, response);
+		
+		
 	}
 
 

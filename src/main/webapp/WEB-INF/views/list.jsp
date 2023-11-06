@@ -25,7 +25,7 @@ contentType="text/html; charset=UTF-8"
       for (HashMap<String, String> columns : rows) {
     %>
     <span><%= columns.get("id") %></span>
-    <span><a href=''><%= columns.get("title") %></a></span><br>
+    <span><a href='show?id=<%= columns.get("id") %>'><%= columns.get("title") %></a></span><br><!-- //show?id= columns.get("id") %>は中級で追加 -->
     <% } %>
     <p><a href="">新規作成</a></p>
       

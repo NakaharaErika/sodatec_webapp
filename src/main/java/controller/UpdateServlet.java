@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -15,14 +12,17 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/list")
-public class ListServlet extends HttpServlet {
+@WebServlet("/update")
+public class UpdateServlet extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
 		if (request.getAttribute("message") == null) {
 			request.setAttribute("message", "todoを管理しましょ");
 		}
+		
+		int postId = Integer.parseInt(request.getParameter("id"));
+		String title = request.getParameter("title");
+		String content = request.getParameter("content");
 		
 		String url = "jdbc:mysql://localhost/todo";
 		String user = "root";
@@ -33,32 +33,25 @@ public class ListServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-		String sql = "SELECT * FROM posts";
+		String sql = "UPDATE posts SET title = ?, content = ? WHERE id =?";
 		try (Connection connection = DriverManager.getConnection(url,user,password);
-		PreparedStatement statement =connection.prepareStatement(sql);
-		ResultSet results = statement.executeQuery()){
-			ArrayList<HashMap<String, String>> rows = new ArrayList<HashMap<String, String>>();
+		PreparedStatement statement =connection.prepareStatement(sql)){
+		
+			statement.setString(1, title);
+			statement.setString(2, content);
+			statement.setInt(3, postId);
+			int number = statement.executeUpdate();
+			request.setAttribute("message", "ID:" + postId + "の更新ができました");
 			
-			while(results.next()) {
-				HashMap<String, String> columns = new HashMap<String, String>();
-				
-				String id = results.getString("id");
-				columns.put("id", id);
-				String title = results.getString("title");
-				columns.put("title", title);
-				String content = results.getString("content");
-				columns.put("content", content);
-				
-				rows.add(columns);
-			}
-			request.setAttribute("rows", rows);
 		} catch (Exception e) {
 			request.setAttribute("message", "Exception:" + e.getMessage());
 		}
 		
-		String view = "/WEB-INF/views/list.jsp";
-		RequestDispatcher dispatcher = request.getRequestDispatcher(view);
+		String forward = "/show?id=" + postId;
+		RequestDispatcher dispatcher = request.getRequestDispatcher(forward);
 		dispatcher.forward(request, response);
+		
+		
 	}
 
 
