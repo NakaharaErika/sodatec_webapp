@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -13,15 +12,16 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/show")
-public class ShowServlet extends HttpServlet {
+@WebServlet("/create")
+public class CreateServlet extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if (request.getAttribute("message") == null) {
 			request.setAttribute("message", "todoを管理しましょ");
 		}
 		
-		int postId = Integer.parseInt(request.getParameter("id"));
+		String title = request.getParameter("title");
+		String content = request.getParameter("content");
 		
 		String url = "jdbc:mysql://localhost/todo";
 		String user = "root";
@@ -32,27 +32,25 @@ public class ShowServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-		String sql = "SELECT * FROM posts WHERE id =?";
+		String sql = "INSERT INTO posts (title, content) VALUES (?,?)";
 		try (Connection connection = DriverManager.getConnection(url,user,password);
 		PreparedStatement statement =connection.prepareStatement(sql)){
 		
-			statement.setInt(1, postId);
-			ResultSet results = statement.executeQuery();
+			statement.setString(1, title);
+			statement.setString(2, content);
+			int number = statement.executeUpdate();
+			request.setAttribute("message", "タイトル:" + title + "の新規作成ができました");
 			
-			while(results.next()) {
-				String id = results.getString("id");
-				request.setAttribute("id", id);
-				String title = results.getString("title");
-				request.setAttribute("title", title);
-				String content = results.getString("content").replaceAll("¥n", "<br>");
-				request.setAttribute("content", content);
-			}
 		} catch (Exception e) {
 			request.setAttribute("message", "Exception:" + e.getMessage());
 		}
 		
-		String view = "/WEB-INF/views/post.jsp";
-		RequestDispatcher dispatcher = request.getRequestDispatcher(view);
+		String forward = "/list";
+		RequestDispatcher dispatcher = request.getRequestDispatcher(forward);
 		dispatcher.forward(request, response);
+		
+		
 	}
+
+
 }

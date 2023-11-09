@@ -27,7 +27,7 @@ contentType="text/html; charset=UTF-8"
       <a href='show?id=<%= request.getAttribute("id") %>'>キャンセル</a>
   </form>
 <ul>
-      <li><p><a href=''>戻る</a></p></li>
+      <li><p><a href='list'>戻る</a></p></li>
     </ul>      
 </body>
 </html>

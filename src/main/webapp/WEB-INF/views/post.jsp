@@ -13,8 +13,8 @@ contentType="text/html; charset=UTF-8"
 </head>
 <body>
     <h1>Todo詳細</h1>
-    <% String message = (String)request.getAttribute("message"); %>
-    <p><%= message %></p>
+   
+    <p><%= request.getAttribute("message") %></p>
     <p><strong>タイトル：</strong><%= request.getAttribute("title") %></p>
     <p><strong>本文：</strong><%= request.getAttribute("content") %></p><br>
     <ul>
